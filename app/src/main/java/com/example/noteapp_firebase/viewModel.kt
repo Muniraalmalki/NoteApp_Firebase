@@ -22,7 +22,8 @@ class ViewModel(application: Application): AndroidViewModel(application) {
     fun addNote(note: Note){
         CoroutineScope(Dispatchers.IO).launch{
            val note = hashMapOf(
-               note.noteTitle to note.noteDescription,
+               "noteTitle" to note.noteTitle,
+               "noteDescription" to note.noteDescription ,
            )
             db.collection("notes").add(note)
                 .addOnSuccessListener { documentReference ->
@@ -43,32 +44,25 @@ class ViewModel(application: Application): AndroidViewModel(application) {
                 result ->
                 var details = arrayListOf<Note>()
                 for (document in result){
-//                    var count =1L
-//                    var desc = ""
-//                    var title = ""
-//                    for (value in document
-//                        .data.values)
-//                    {
-//                        if (count % 2.0 == 0.0)
-//                        {
-//
-//                            title = value.toString()
-//                        }
-//                        desc = value.toString()
-//                        count ++
-////                        notes.postValue(details)
-//                        Log.d(TAG, "${document.id} => ${value}")
-//                    }
-//                    Log.d(TAG, "${document.id} => ${title}, ${desc}")
-//                    details.add(Note(document.id,title,desc))
-                    document.data.map{
-                        (key,value)-> details.add(Note(document.id,key.toString(),value.toString()))
-                    }
-                    notes.postValue(details)
-                        Log.d(TAG, "${document.id} => ${document.data.keys}")
+                    var desc = ""
+                    var title = ""
+                    for (value in document
+                        .data)
+                    {
+                        if(value.key.equals("noteTitle"))
+                        {
+                            title = value.value.toString()
+                        }
+                        else if(value.key.equals("noteDescription")){
+                            desc = value.value.toString()
+                        }
 
+                    }
+                    details.add(Note(document.id,title,desc))
+                    notes.postValue(details)
 
                 }
+
             }
             .addOnFailureListener { e -> Log.w(TAG, "Error adding document", e) }
         return notes
